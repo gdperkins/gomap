@@ -1,1 +1,1 @@
-package gomap
+package gomapper

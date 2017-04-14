@@ -1,4 +1,4 @@
-package gomap
+package gomapper
 
 import (
 	"reflect"
