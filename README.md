@@ -23,7 +23,7 @@ viewModel := PublicEmployee{}
 
 fmt.Println(vm)
 
-gm := gomap.NewDefault()
+gm := gomapper.NewDefault()
 gm.Map(source, &viewModel)
 
 fmt.Println(vm)
