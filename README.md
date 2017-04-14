@@ -6,6 +6,8 @@ Simple package to map structs together
 
 ```
 
+import "github.com/gdperkins/gomapper"
+
 type Employee struct {
     Firstname string
     Salary float32
@@ -21,7 +23,7 @@ viewModel := PublicEmployee{}
 
 fmt.Println(vm)
 
-gm := NewDefault()
+gm := gomap.NewDefault()
 gm.Map(source, &viewModel)
 
 fmt.Println(vm)
