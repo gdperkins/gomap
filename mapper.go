@@ -7,7 +7,7 @@ import (
 // Options is a configuration container to pass to the
 // new instance methods for GoMap
 type Options struct {
-	Maps         []Mapping
+	Overrides    []Mapping
 	IgnoreFields []string
 	IgnoreNil    bool
 }
@@ -15,7 +15,7 @@ type Options struct {
 // GoMap holds all configuration for any mappings
 // registered at the startup
 type GoMap struct {
-	maps         []Mapping
+	overrides    []Mapping
 	ignoreFields []string
 }
 
@@ -29,7 +29,7 @@ type Mapping struct {
 // New returns a new gomapme Confguration struct
 func New(options Options) *GoMap {
 	return &GoMap{
-		maps:         options.Maps,
+		overrides:    options.Overrides,
 		ignoreFields: options.IgnoreFields,
 	}
 }
@@ -37,7 +37,7 @@ func New(options Options) *GoMap {
 // NewDefault returns a plain GoMap func with default configuration
 func NewDefault() *GoMap {
 	gomap := GoMap{
-		maps:         make([]Mapping, 0),
+		overrides:    make([]Mapping, 0),
 		ignoreFields: make([]string, 0),
 	}
 	return &gomap
@@ -58,22 +58,25 @@ func (g *GoMap) Map(s interface{}, d interface{}) {
 	for i := 0; i < dstType.NumField(); i++ {
 
 		ft := dstType.Field(i)
-		sv := srcVal.FieldByName(ft.Name)
-
-		if checkIgnore && ignoreMatch(g.ignoreFields, ft.Name) {
+		if checkIgnore && g.ignoreField(ft.Name) {
 			continue
 		}
 
+		//try find a mapping override match
+
+		sv := srcVal.FieldByName(ft.Name)
+
 		if sv.IsValid() {
 			fv := dstVal.FieldByName(ft.Name)
+			//add logic here to cast
 			fv.Set(sv)
 		}
 	}
 }
 
-func ignoreMatch(ignores []string, field string) bool {
-	for i := range ignores {
-		if ignores[i] == field {
+func (g *GoMap) ignoreField(field string) bool {
+	for i := range g.ignoreFields {
+		if g.ignoreFields[i] == field {
 			return true
 		}
 	}
@@ -83,5 +86,5 @@ func ignoreMatch(ignores []string, field string) bool {
 // Add applys a new mapping between two structs to the
 // global configuration
 func (g *GoMap) Add(m Mapping) {
-	g.maps = append(g.maps, m)
+	g.overrides = append(g.overrides, m)
 }
