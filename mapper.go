@@ -57,8 +57,8 @@ func (g *GoMap) Map(s interface{}, d interface{}) {
 
 	// loop the desintation VM fields
 	for i := 0; i < dstType.NumField(); i++ {
-		var src string
 		ft := dstType.Field(i)
+		src := ft.Name
 
 		if hasConfig {
 			if _, ok := config.FieldLinks[ft.Name]; ok {
@@ -67,10 +67,6 @@ func (g *GoMap) Map(s interface{}, d interface{}) {
 				}
 				src = config.FieldLinks[ft.Name].Source
 			}
-		}
-
-		if src == "" {
-			src = ft.Name
 		}
 
 		if sv := srcVal.FieldByName(src); sv.IsValid() {
