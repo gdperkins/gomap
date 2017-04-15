@@ -4,10 +4,16 @@ import (
 	"reflect"
 )
 
-// Options is a configuration container to pass to the
-// new instance methods for GoMap
-type Options struct {
-	MappingConfig []Mapping
+// Mapping between two different structs
+type Mapping struct {
+	Key        string
+	FieldLinks map[string]FieldConfig
+}
+
+// FieldConfig describes rules for the destination field
+type FieldConfig struct {
+	Ignore bool
+	Source string
 }
 
 // GoMap holds all configuration for any mappings
@@ -16,27 +22,8 @@ type GoMap struct {
 	mappingConfig []Mapping
 }
 
-// Mapping between two different structs
-type Mapping struct {
-	Key        string
-	FieldLinks map[string]MapConfig
-}
-
-// MapConfig describes rules for the destination field
-type MapConfig struct {
-	Ignore bool
-	Source string
-}
-
-// New returns a new gomapme Confguration struct
-func New(options Options) *GoMap {
-	return &GoMap{
-		mappingConfig: options.MappingConfig,
-	}
-}
-
-// NewDefault returns a plain GoMap func with default configuration
-func NewDefault() *GoMap {
+// New returns a plain GoMap func with default configuration
+func New() *GoMap {
 	gomap := GoMap{
 		mappingConfig: make([]Mapping, 0),
 	}
@@ -45,14 +32,17 @@ func NewDefault() *GoMap {
 
 // Map transforms the input struct to the output struct. Always pass the
 // destination by reference and the source by value
-func (g *GoMap) Map(s interface{}, d interface{}) {
+func (g *GoMap) Map(s interface{}, d interface{}) error {
+
+	//validate inputs
+
 	dstPtrVal := reflect.ValueOf(d)
 	dstPtrType := dstPtrVal.Type()
-	dstType := dstPtrType.Elem()
 	dstVal := reflect.Indirect(dstPtrVal)
 	srcVal := reflect.ValueOf(s)
 	srcType := reflect.TypeOf(s)
 
+	dstType := dstPtrType.Elem()
 	hasConfig, config := g.getConfig(srcType.Name() + dstType.Name())
 
 	// loop the desintation VM fields
@@ -75,6 +65,7 @@ func (g *GoMap) Map(s interface{}, d interface{}) {
 			fv.Set(sv)
 		}
 	}
+	return nil
 }
 
 func (g *GoMap) getConfig(key string) (bool, Mapping) {
@@ -89,7 +80,7 @@ func (g *GoMap) getConfig(key string) (bool, Mapping) {
 
 // Add applys a new mapping between two structs to the
 // global configuration
-func (g *GoMap) Add(source interface{}, destination interface{}, config map[string]MapConfig) {
+func (g *GoMap) Add(source interface{}, destination interface{}, config map[string]FieldConfig) {
 	key := reflect.TypeOf(source).Name() + reflect.TypeOf(destination).Name()
 	g.mappingConfig = append(g.mappingConfig, Mapping{key, config})
 }

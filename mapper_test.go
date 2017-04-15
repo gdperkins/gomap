@@ -18,12 +18,12 @@ type employeeViewModel struct {
 func TestCanIgnoreField(t *testing.T) {
 	t.Log("Ignoring FirstName (expecting: empty string)")
 
-	gm := NewDefault()
+	gm := New()
 
 	source := employee{"John", "Doe", 1000}
 	destination := employeeViewModel{}
 
-	gm.Add(source, destination, map[string]MapConfig{
+	gm.Add(source, destination, map[string]FieldConfig{
 		"FirstName": {
 			Ignore: true,
 		},
@@ -35,16 +35,17 @@ func TestCanIgnoreField(t *testing.T) {
 
 func TestCanChangeFieldSource(t *testing.T) {
 	t.Log("Changing FirstName source to LastName (expecting: Doe)")
-	gm := NewDefault()
+	gm := New()
 
 	source := employee{"John", "Doe", 1000}
 	destination := employeeViewModel{}
 
-	gm.Add(source, destination, map[string]MapConfig{
+	gm.Add(source, destination, map[string]FieldConfig{
 		"FirstName": {
 			Source: "LastName",
 		},
 	})
+
 	gm.Map(employee{"John", "Doe", 1000}, &destination)
 
 	if destination.FirstName != "Doe" || destination.LastName != "Doe" {
