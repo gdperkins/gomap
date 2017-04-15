@@ -1,4 +1,4 @@
-# GoMap [![Build Status](https://travis-ci.org/gdperkins/gomap.svg?branch=master)](https://travis-ci.org/gdperkins/gomap)
+# GoMap [![Build Status](https://travis-ci.org/gdperkins/gomap.svg?branch=master)](https://travis-ci.org/gdperkins/gomap) [![Go Report Card](https://goreportcard.com/badge/github.com/gdperkins/gomap)](https://goreportcard.com/report/github.com/gdperkins/gomap)
 
 Simple package to map structs together
 
