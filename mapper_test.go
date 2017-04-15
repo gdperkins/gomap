@@ -15,7 +15,7 @@ type employeeDestination struct {
 	LastName  string
 }
 
-func TestCanIgnore(t *testing.T) {
+func TestCanIgnoreField(t *testing.T) {
 	t.Log("Ignoring firstname (expecting an empty string)")
 	gm := New(Options{
 		IgnoreFields: []string{"FirstName"},
