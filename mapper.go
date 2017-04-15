@@ -69,6 +69,10 @@ func (g *GoMap) Map(s interface{}, d interface{}) {
 			}
 		}
 
+		if src == "" {
+			src = ft.Name
+		}
+
 		if sv := srcVal.FieldByName(src); sv.IsValid() {
 			fv := dstVal.FieldByName(ft.Name)
 			//add logic here to cast
