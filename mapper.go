@@ -7,38 +7,38 @@ import (
 // Options is a configuration container to pass to the
 // new instance methods for GoMap
 type Options struct {
-	Overrides    []Mapping
-	IgnoreFields []string
-	IgnoreNil    bool
+	MappingConfig []Mapping
 }
 
 // GoMap holds all configuration for any mappings
 // registered at the startup
 type GoMap struct {
-	overrides    []Mapping
-	ignoreFields []string
+	mappingConfig []Mapping
 }
 
 // Mapping between two different structs
 type Mapping struct {
-	Source      interface{}
-	Destination interface{}
-	FieldLinks  map[string]string
+	Key        string
+	FieldLinks map[string]MapConfig
+}
+
+// MapConfig describes rules for the destination field
+type MapConfig struct {
+	Ignore bool
+	Source string
 }
 
 // New returns a new gomapme Confguration struct
 func New(options Options) *GoMap {
 	return &GoMap{
-		overrides:    options.Overrides,
-		ignoreFields: options.IgnoreFields,
+		mappingConfig: options.MappingConfig,
 	}
 }
 
 // NewDefault returns a plain GoMap func with default configuration
 func NewDefault() *GoMap {
 	gomap := GoMap{
-		overrides:    make([]Mapping, 0),
-		ignoreFields: make([]string, 0),
+		mappingConfig: make([]Mapping, 0),
 	}
 	return &gomap
 }
@@ -51,22 +51,25 @@ func (g *GoMap) Map(s interface{}, d interface{}) {
 	dstType := dstPtrType.Elem()
 	dstVal := reflect.Indirect(dstPtrVal)
 	srcVal := reflect.ValueOf(s)
+	srcType := reflect.TypeOf(s)
 
-	checkIgnore := len(g.ignoreFields) > 0
+	hasConfig, config := g.getConfig(srcType.Name() + dstType.Name())
 
 	// loop the desintation VM fields
 	for i := 0; i < dstType.NumField(); i++ {
-
+		var src string
 		ft := dstType.Field(i)
-		if checkIgnore && g.ignoreField(ft.Name) {
-			continue
+
+		if hasConfig {
+			if _, ok := config.FieldLinks[ft.Name]; ok {
+				if config.FieldLinks[ft.Name].Ignore {
+					continue
+				}
+				src = config.FieldLinks[ft.Name].Source
+			}
 		}
 
-		//try find a mapping override match
-
-		sv := srcVal.FieldByName(ft.Name)
-
-		if sv.IsValid() {
+		if sv := srcVal.FieldByName(src); sv.IsValid() {
 			fv := dstVal.FieldByName(ft.Name)
 			//add logic here to cast
 			fv.Set(sv)
@@ -74,17 +77,19 @@ func (g *GoMap) Map(s interface{}, d interface{}) {
 	}
 }
 
-func (g *GoMap) ignoreField(field string) bool {
-	for i := range g.ignoreFields {
-		if g.ignoreFields[i] == field {
-			return true
+func (g *GoMap) getConfig(key string) (bool, Mapping) {
+	var m Mapping
+	for i := range g.mappingConfig {
+		if g.mappingConfig[i].Key == key {
+			return true, g.mappingConfig[i]
 		}
 	}
-	return false
+	return false, m
 }
 
 // Add applys a new mapping between two structs to the
 // global configuration
-func (g *GoMap) Add(m Mapping) {
-	g.overrides = append(g.overrides, m)
+func (g *GoMap) Add(source interface{}, destination interface{}, config map[string]MapConfig) {
+	key := reflect.TypeOf(source).Name() + reflect.TypeOf(destination).Name()
+	g.mappingConfig = append(g.mappingConfig, Mapping{key, config})
 }
