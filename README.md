@@ -26,49 +26,49 @@ type PublicEmployee struct {
 No configuration required, fields are mapped from the source fields to the target fields in a case sensitive manner.
 
 ```go
-    viewModel := PublicEmployee{}
-    
-    gm := gomapper.NewDefault()
-    gm.Map(Employee{"John", "Doe",  1006}, &viewModel)
-    fmt.Println(viewModel)
-    //output: {John Doe}
+viewModel := PublicEmployee{}
+
+gm := gomapper.NewDefault()
+gm.Map(Employee{"John", "Doe",  1006}, &viewModel)
+fmt.Println(viewModel)
+//output: {John Doe}
 ```
 ### Custom mapping
 
 Sets the target FirstName fields source to the source LastName
 
 ```go
-    source := Employee{"John", "Doe",  1006}
-    viewModel := PublicEmployee{}
+source := Employee{"John", "Doe",  1006}
+viewModel := PublicEmployee{}
 
-    gm := gomapper.NewDefault()
-    gm.Add(source, destination, map[string]FieldConfig{
-		"FirstName": {
-			Source: "LastName",
-		},
-	})
+gm := gomapper.NewDefault()
+gm.Add(source, destination, map[string]FieldConfig{
+    "FirstName": {
+        Source: "LastName",
+    },
+})
 
-    gm.Map(source, &destination)
-    fmt.Println(viewModel)
-    //output: {Doe Doe}
+gm.Map(source, &destination)
+fmt.Println(viewModel)
+//output: {Doe Doe}
 ```
 
 ### Explicitly Ignore Field
 
 ```go
-    source := Employee{"John", "Doe",  1006}
-    viewModel := PublicEmployee{}
+source := Employee{"John", "Doe",  1006}
+viewModel := PublicEmployee{}
 
-    gm := gomapper.NewDefault()
-    gm.Add(source, destination, map[string]FieldConfig{
-		"LastName": {
-			Ignore: true,
-		},
-	})
+gm := gomapper.NewDefault()
+gm.Add(source, destination, map[string]FieldConfig{
+    "LastName": {
+        Ignore: true,
+    },
+})
 
-    gm.Map(source, &destination)
-    fmt.Println(viewModel)
-    //output: {Doe }
+gm.Map(source, &destination)
+fmt.Println(viewModel)
+//output: {Doe }
 ```
 
 ## Todo
