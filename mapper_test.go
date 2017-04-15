@@ -46,7 +46,9 @@ func TestCanChangeFieldSource(t *testing.T) {
 		},
 	})
 
+	//for i := 0; i < 1000000; i++ {
 	gm.Map(employee{"John", "Doe", 1000}, &destination)
+	//}
 
 	if destination.FirstName != "Doe" || destination.LastName != "Doe" {
 		t.Errorf("Test failed, FirstName should be equal to 'Doe'.")

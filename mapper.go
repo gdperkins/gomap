@@ -1,6 +1,8 @@
 package gomap
 
 import (
+	"errors"
+	"fmt"
 	"reflect"
 )
 
@@ -34,15 +36,12 @@ func New() *GoMap {
 // destination by reference and the source by value
 func (g *GoMap) Map(s interface{}, d interface{}) error {
 
-	//validate inputs
+	dstVal, dstType, srcVal, srcType, err := validInput(s, d)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
 
-	dstPtrVal := reflect.ValueOf(d)
-	dstPtrType := dstPtrVal.Type()
-	dstVal := reflect.Indirect(dstPtrVal)
-	srcVal := reflect.ValueOf(s)
-	srcType := reflect.TypeOf(s)
-
-	dstType := dstPtrType.Elem()
 	hasConfig, config := g.getConfig(srcType.Name() + dstType.Name())
 
 	// loop the desintation VM fields
@@ -66,6 +65,24 @@ func (g *GoMap) Map(s interface{}, d interface{}) error {
 		}
 	}
 	return nil
+}
+
+func validInput(s interface{}, d interface{}) (reflect.Value, reflect.Type, reflect.Value, reflect.Type, error) {
+	dstPtr := reflect.ValueOf(d)
+	dstVal := reflect.Indirect(dstPtr)
+	dstType := dstPtr.Type().Elem()
+	srcVal := reflect.ValueOf(s)
+	srcType := reflect.TypeOf(s)
+
+	if srcType.Kind().String() != "struct" {
+		return dstVal, dstType, srcVal, srcType, errors.New("Invalid source parameter type")
+	}
+
+	if dstPtr.Kind().String() != "ptr" {
+		return dstVal, dstType, srcVal, srcType, errors.New("Invalid destination parameter type")
+	}
+
+	return dstVal, dstType, srcVal, srcType, nil
 }
 
 func (g *GoMap) getConfig(key string) (bool, Mapping) {
