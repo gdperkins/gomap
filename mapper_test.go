@@ -23,6 +23,7 @@ func TestCanMap(t *testing.T) {
 
 	source := employee{"John", "Doe", 1000}
 	destination := employeeViewModel{}
+
 	gm := New()
 	gm.Map(source, &destination)
 

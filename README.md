@@ -28,7 +28,7 @@ No configuration required, fields are mapped from the source fields to the targe
 ```go
 viewModel := PublicEmployee{}
 
-gm := gomapper.NewDefault()
+gm := gomap.New()
 gm.Map(Employee{"John", "Doe",  1006}, &viewModel)
 fmt.Println(viewModel)
 //output: {John Doe}
@@ -41,7 +41,7 @@ Sets the target FirstName fields source to the source LastName
 source := Employee{"John", "Doe",  1006}
 viewModel := PublicEmployee{}
 
-gm := gomapper.NewDefault()
+gm := gomap.New()
 gm.Add(source, destination, map[string]FieldConfig{
     "FirstName": {
         Source: "LastName",
@@ -59,7 +59,7 @@ fmt.Println(viewModel)
 source := Employee{"John", "Doe",  1006}
 viewModel := PublicEmployee{}
 
-gm := gomapper.NewDefault()
+gm := gomap.New()
 gm.Add(source, destination, map[string]FieldConfig{
     "LastName": {
         Ignore: true,
