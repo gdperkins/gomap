@@ -2,7 +2,6 @@ package gomap
 
 import (
 	"errors"
-	"fmt"
 	"reflect"
 )
 
@@ -32,19 +31,18 @@ func New() *GoMap {
 	return &gomap
 }
 
-// Map transforms the input struct to the output struct. Always pass the
-// destination by reference and the source by value
+// Map transforms the input struct to the output struct. s (source) has to
+// be passed by value and d (destination) needs to be passed by reference.
+// Both parameters need to be of type struct or a error will be returned.
 func (g *GoMap) Map(s interface{}, d interface{}) error {
-
 	dstVal, dstType, srcVal, srcType, err := validInput(s, d)
 	if err != nil {
-		fmt.Println(err)
 		return err
 	}
 
 	hasConfig, config := g.getConfig(srcType.Name() + dstType.Name())
 
-	// loop the desintation VM fields
+	// loop the desintation struct fields
 	for i := 0; i < dstType.NumField(); i++ {
 		ft := dstType.Field(i)
 		src := ft.Name

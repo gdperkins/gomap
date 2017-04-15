@@ -2,35 +2,77 @@
 
 Simple package to map structs together
 
-## Getting Started
+## Examples
 
-```
+Structs used for all examples:
 
-import "github.com/gdperkins/gomapper"
-
+```go
 type Employee struct {
-    Firstname string
-    Salary float32
+    FirstName string
+    LastName  string
+    Salary    int
     //other sensitive fields
 }
 
 type PublicEmployee struct {
-    Firstname string
+    FirstName string
+    LastName  string
 }
 
-source := Employee{"Bob", 1006}
-viewModel := PublicEmployee{}
+```
 
-fmt.Println(vm)
+### Default mapping
 
-gm := gomapper.NewDefault()
-gm.Map(source, &viewModel)
+No configuration required, fields are mapped from the source fields to the target fields in a case sensitive manner.
 
-fmt.Println(vm)
+```go
+    viewModel := PublicEmployee{}
+    
+    gm := gomapper.NewDefault()
+    gm.Map(Employee{"John", "Doe",  1006}, &viewModel)
+    fmt.Println(viewModel)
+    //output: {John Doe}
+```
+### Custom mapping
 
+Sets the target FirstName fields source to the source LastName
+
+```go
+    source := Employee{"John", "Doe",  1006}
+    viewModel := PublicEmployee{}
+
+    gm := gomapper.NewDefault()
+    gm.Add(source, destination, map[string]FieldConfig{
+		"FirstName": {
+			Source: "LastName",
+		},
+	})
+
+    gm.Map(source, &destination)
+    fmt.Println(viewModel)
+    //output: {Doe Doe}
+```
+
+### Explicitly Ignore Field
+
+```go
+    source := Employee{"John", "Doe",  1006}
+    viewModel := PublicEmployee{}
+
+    gm := gomapper.NewDefault()
+    gm.Add(source, destination, map[string]FieldConfig{
+		"LastName": {
+			Ignore: true,
+		},
+	})
+
+    gm.Map(source, &destination)
+    fmt.Println(viewModel)
+    //output: {Doe }
 ```
 
 ## Todo
 
 * Nested struct mapping
 * Field type casting
+* Pre map func invocation
