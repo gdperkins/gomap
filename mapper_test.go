@@ -2,8 +2,6 @@ package gomap
 
 import (
 	"testing"
-
-	"github.com/gomap"
 )
 
 type employeeSource struct {
@@ -18,7 +16,7 @@ type employeeDestination struct {
 }
 
 func TestCanIgnore(t *testing.T) {
-	gm := gomap.New(gomap.Options{
+	gm := New(Options{
 		IgnoreFields: []string{"FirstName"},
 	})
 
