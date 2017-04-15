@@ -1,4 +1,4 @@
-package gomap_test
+package gomap
 
 import (
 	"testing"
