@@ -65,3 +65,14 @@ func TestCanChangeFieldSource(t *testing.T) {
 	assert.Equal(t, destination.FirstName, "Doe", "FirstName should be Doe")
 	assert.Equal(t, destination.LastName, "Doe", "LastName should be Doe")
 }
+
+func TestSourceTypeAcceptance(t *testing.T) {
+	t.Log("Confirming only source type acceptance")
+
+	source := employee{"John", "Doe", 1000}
+	destination := employeeViewModel{}
+
+	gm := New()
+	assert.Error(t, gm.Map(&source, destination), "Error should be returned")
+
+}

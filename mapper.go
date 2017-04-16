@@ -35,10 +35,16 @@ func New() *GoMap {
 // be passed by value and d (destination) needs to be passed by reference.
 // Both parameters need to be of type struct or a error will be returned.
 func (g *GoMap) Map(s interface{}, d interface{}) error {
-	dstVal, dstType, srcVal, srcType, err := validInput(s, d)
-	if err != nil {
+
+	if err := validInput(s, d); err != nil {
 		return err
 	}
+
+	dstPtr := reflect.ValueOf(d)
+	dstVal := reflect.Indirect(dstPtr)
+	dstType := dstPtr.Type().Elem()
+	srcVal := reflect.ValueOf(s)
+	srcType := reflect.TypeOf(s)
 
 	hasConfig, config := g.getConfig(srcType.Name() + dstType.Name())
 
@@ -65,22 +71,16 @@ func (g *GoMap) Map(s interface{}, d interface{}) error {
 	return nil
 }
 
-func validInput(s interface{}, d interface{}) (reflect.Value, reflect.Type, reflect.Value, reflect.Type, error) {
-	dstPtr := reflect.ValueOf(d)
-	dstVal := reflect.Indirect(dstPtr)
-	dstType := dstPtr.Type().Elem()
-	srcVal := reflect.ValueOf(s)
-	srcType := reflect.TypeOf(s)
-
-	if srcType.Kind().String() != "struct" {
-		return dstVal, dstType, srcVal, srcType, errors.New("Invalid source parameter type")
+func validInput(s interface{}, d interface{}) error {
+	if reflect.TypeOf(s).Kind().String() != "struct" {
+		return errors.New("Invalid source parameter type")
 	}
 
-	if dstPtr.Kind().String() != "ptr" {
-		return dstVal, dstType, srcVal, srcType, errors.New("Invalid destination parameter type")
+	if reflect.TypeOf(d).Kind().String() != "ptr" {
+		return errors.New("Invalid destination parameter type")
 	}
 
-	return dstVal, dstType, srcVal, srcType, nil
+	return nil
 }
 
 func (g *GoMap) getConfig(key string) (bool, Mapping) {
