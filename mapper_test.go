@@ -44,7 +44,7 @@ func TestCanIgnoreField(t *testing.T) {
 			Ignore: true,
 		},
 	})
-
+	gm.Map(source, &destination)
 	assert.Empty(t, destination.FirstName, "FirstName should be empty")
 }
 
@@ -67,12 +67,14 @@ func TestCanChangeFieldSource(t *testing.T) {
 }
 
 func TestSourceTypeAcceptance(t *testing.T) {
-	t.Log("Confirming only source type acceptance")
+	t.Log("Confirming source can be passed by value or reference")
 
 	source := employee{"John", "Doe", 1000}
 	destination := employeeViewModel{}
 
 	gm := New()
-	assert.Error(t, gm.Map(&source, destination), "Error should be returned")
-
+	gm.Map(&source, &destination)
+	assert.Equal(t, destination.FirstName, "John", "FirstName should be John")
+	gm.Map(source, &destination)
+	assert.Equal(t, destination.FirstName, "John", "FirstName should be John")
 }
