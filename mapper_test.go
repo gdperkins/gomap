@@ -79,6 +79,27 @@ func TestMapTypeAcceptance(t *testing.T) {
 	gm.Map(source, &destination)
 	assert.Equal(t, destination.FirstName, "John", "FirstName should be John")
 	assert.Error(t, gm.Map(source, destination), "Should not be able to pass destination as value type")
-	assert.Error(t, gm.Map(nil, &destination), "Source cannot be nil")
 	assert.Error(t, gm.Map(100, &destination), "Source should be of type struct")
+}
+
+func TestDuplicateMapConfigsIgnored(t *testing.T) {
+	t.Log("Confirming duplicate configs are ignored")
+	gm := New()
+
+	source := employee{"John", "Doe", 1000}
+	destination := employeeViewModel{}
+
+	gm.Add(source, destination, map[string]FieldConfig{
+		"FirstName": {
+			Source: "LastName",
+		},
+	})
+
+	gm.Add(source, destination, map[string]FieldConfig{
+		"FirstName": {
+			Source: "LastName",
+		},
+	})
+
+	assert.Equal(t, 1, len(gm.mappingConfig), "The second map should have been ignored")
 }

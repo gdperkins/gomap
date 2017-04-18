@@ -37,10 +37,6 @@ func New() *GoMap {
 // a error will be returned.
 func (g *GoMap) Map(s interface{}, d interface{}) error {
 
-	if s == nil || d == nil {
-		return errors.New("Empty source or destination parameter")
-	}
-
 	if reflect.TypeOf(d).Kind().String() != "ptr" {
 		return errors.New("Invalid destination parameter type")
 	}
@@ -101,8 +97,9 @@ func (g *GoMap) getConfig(key string) (bool, Mapping) {
 	return false, m
 }
 
-// Add applys a new mapping between two structs to the
-// global configuration
+// Add applys a new mapping between two structs to the global GoMap configuration. If a
+// key for a map is already present then this map will be map won't be added to the
+// configuration.
 func (g *GoMap) Add(source interface{}, destination interface{}, config map[string]FieldConfig) {
 
 	key := reflect.TypeOf(source).Name() + reflect.TypeOf(destination).Name()
