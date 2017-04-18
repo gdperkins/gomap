@@ -37,6 +37,10 @@ func New() *GoMap {
 // a error will be returned.
 func (g *GoMap) Map(s interface{}, d interface{}) error {
 
+	if s == nil || d == nil {
+		return errors.New("Empty source or destination parameter")
+	}
+
 	if reflect.TypeOf(d).Kind().String() != "ptr" {
 		return errors.New("Invalid destination parameter type")
 	}
@@ -77,14 +81,13 @@ func (g *GoMap) Map(s interface{}, d interface{}) error {
 }
 
 func unpackSource(s interface{}) (reflect.Value, error) {
-	src := reflect.ValueOf(s)
 	switch reflect.TypeOf(s).Kind().String() {
 	case "ptr":
-		return reflect.Indirect(src), nil
+		return reflect.Indirect(reflect.ValueOf(s)), nil
 	case "struct":
-		return src, nil
+		return reflect.ValueOf(s), nil
 	default:
-		return src, errors.New("Invalid source type")
+		return reflect.ValueOf(s), errors.New("Invalid source type")
 	}
 }
 

@@ -66,15 +66,19 @@ func TestCanChangeFieldSource(t *testing.T) {
 	assert.Equal(t, destination.LastName, "Doe", "LastName should be Doe")
 }
 
-func TestSourceTypeAcceptance(t *testing.T) {
-	t.Log("Confirming source can be passed by value or reference")
+func TestMapTypeAcceptance(t *testing.T) {
+	t.Log("Confirming source and destination types")
 
 	source := employee{"John", "Doe", 1000}
 	destination := employeeViewModel{}
 
 	gm := New()
+
 	gm.Map(&source, &destination)
 	assert.Equal(t, destination.FirstName, "John", "FirstName should be John")
 	gm.Map(source, &destination)
 	assert.Equal(t, destination.FirstName, "John", "FirstName should be John")
+	assert.Error(t, gm.Map(source, destination), "Should not be able to pass destination as value type")
+	assert.Error(t, gm.Map(nil, &destination), "Source cannot be nil")
+	assert.Error(t, gm.Map(100, &destination), "Source should be of type struct")
 }
