@@ -104,6 +104,21 @@ func (g *GoMap) getConfig(key string) (bool, Mapping) {
 // Add applys a new mapping between two structs to the
 // global configuration
 func (g *GoMap) Add(source interface{}, destination interface{}, config map[string]FieldConfig) {
+
 	key := reflect.TypeOf(source).Name() + reflect.TypeOf(destination).Name()
+
+	if containsMap(key, g.mappingConfig) == true {
+		return
+	}
+
 	g.mappingConfig = append(g.mappingConfig, Mapping{key, config})
+}
+
+func containsMap(key string, mapping []Mapping) bool {
+	for i := range mapping {
+		if key == mapping[i].Key {
+			return true
+		}
+	}
+	return false
 }
